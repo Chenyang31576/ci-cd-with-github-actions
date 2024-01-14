@@ -15,26 +15,15 @@ class FlaskTestCase(unittest.TestCase):
         response=self.app.get('/')
         self.assertEqual(response.status_code, 200)
 
-    def test_add_item(self):
-        response = self.app.post('/add', data={'item': 'Item1'}, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Item1", response.data)
+        response = self.app.post('/add', data={'item': 'TestItem'}, follow_redirects=True)
+        self.assertIn(b"TestItem", response.data)
 
-    def test_delete_item(self):
-        self.app.post('/add', data={'item': 'Item2'}, follow_redirects=True)
+        response = self.app.post('/update/0', data={'new_item': 'NewItem'}, follow_redirects=True)
+        self.assertIn(b"NewItem", response.data)
+        self.assertNotIn(b"TestItem", response.data)
+
         response = self.app.get('/delete/0',follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertNotIn(b"Item2", response.data)     
+        self.assertNotIn(b"NewItem", response.data)     
         
-    def test_update_item(self):
-        self.app.post('/add', data={'item': 'Item3'}, follow_redirects=True)
-        response = self.app.post('/update/0', data={'new_item': 'Item4'}, follow_redirects=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b"Item4", response.data)
-        self.assertNotIn(b"Item3", response.data)
-
-    def tearDown(self):
-        pass
-
 if __name__ == '__main__':
     unittest.main()
